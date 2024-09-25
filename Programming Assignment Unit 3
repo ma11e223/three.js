@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="description" content="CS4406 Computer Graphics - Exercise #1" />
+    <meta charset="utf-8" />
+    <title>Sample Three.js</title>
+    <style>
+        #container {
+            background: #000000;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Prevents scrollbars from appearing */
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script src="https://threejs.org/build/three.js"></script>
+<script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
+
+<script type="text/javascript">
+    // Set the scene size
+    var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+
+    // Set some camera attributes
+    var VIEW_ANGLE = 45, ASPECT = WIDTH / HEIGHT, NEAR = 1, FAR = 1000;
+
+    // Get the DOM element to attach to
+    var $container = $('#container');
+
+    // Create a WebGL renderer, camera, and a scene
+    var renderer = new THREE.WebGLRenderer();
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+    
+    // Set camera position
+    camera.position.z = 200; 
+    scene.add(camera);
+
+    // Set up the light source
+    var light = new THREE.PointLight(0xffffaa); // Light-yellow color
+    light.position.set(-100, 100, 100); // Upper left corner
+    scene.add(light);
+
+    // Create a cube
+    var geometry = new THREE.BoxGeometry(10, 10, 10); // Cube size
+    var material = new THREE.MeshLambertMaterial({ color: 0xff0000 }); // Initial color: red
+    var cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+
+    // Initialize position and velocity of the cube
+    var velocity = new THREE.Vector3(1, 1, 0); // Speed in x and y direction
+    var colorChangeFlag = false;
+
+    // Start the renderer
+    renderer.setSize(WIDTH, HEIGHT);
+    $container.append(renderer.domElement);
+
+    // Function to animate the cube
+    function animate() {
+        requestAnimationFrame(animate);
+        updateCube();
+        render();
+    }
+
+    // Update the cube's position and handle bouncing
+    function updateCube() {
+        cube.position.add(velocity); // Move cube by velocity
+
+        // Check for collisions with the edges
+        if (cube.position.x >= WIDTH / 2 || cube.position.x <= -WIDTH / 2) {
+            velocity.x = -velocity.x; // Reverse x direction
+            changeColor(); // Change color on collision
+        }
+        if (cube.position.y >= HEIGHT / 2 || cube.position.y <= -HEIGHT / 2) {
+            velocity.y = -velocity.y; // Reverse y direction
+            changeColor(); // Change color on collision
+        }
+    }
+
+    // Change the cube's color randomly
+    function changeColor() {
+        cube.material.color.setHex(Math.random() * 0xffffff); // Set to a random color
+    }
+
+    // Render the scene
+    function render() {
+        renderer.render(scene, camera);
+    }
+
+    animate();
+</script>
+</body>
+</html>
